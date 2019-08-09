@@ -7,9 +7,9 @@ verify_ssl = true
 autopep8 = "*"
 
 [packages]
-logger = "*"
 boto3 = "*"
-configparser = "*"
+requests = "*"
+pycryptodomex = "*"
 
 [requires]
 python_version = "3.7"

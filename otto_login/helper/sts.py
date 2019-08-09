@@ -3,9 +3,19 @@ import boto3
 from otto_login import settings
 
 
-class LoginHandler:
+class StsHandler:
     def __init__(self):
         self.sts = boto3.client('sts')
+
+    def get_root_session(self):
+        if self.check_session_token():
+            root_session = self.get_profile_session(settings.intermediate_profile)
+        else:
+            token = input("Enter MFA-Token: ")
+            session_credentials = self.get_session_token(token)['Credentials']
+            root_session = self.get_credentials_session(session_credentials)
+
+        return root_session
 
     def get_session_token(self, mfa_token: str):
         return self.sts.get_session_token(
@@ -13,6 +23,7 @@ class LoginHandler:
             TokenCode=mfa_token
         )
 
+    # noinspection PyBroadException
     @staticmethod
     def check_session_token():
         try:

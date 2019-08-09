@@ -1,5 +1,15 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <option name="FORMATTER_TAGS_ENABLED" value="true" />
+    <Python>
+      <option name="SPACE_AROUND_EQ_IN_NAMED_PARAMETER" value="true" />
+      <option name="SPACE_AROUND_EQ_IN_KEYWORD_ARGUMENT" value="true" />
+    </Python>
+    <codeStyleSettings language="Scala">
+      <indentOptions>
+        <option name="USE_TAB_CHARACTER" value="true" />
+      </indentOptions>
+    </codeStyleSettings>
     <codeStyleSettings language="ruby">
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="2" />

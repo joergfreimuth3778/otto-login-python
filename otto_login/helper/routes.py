@@ -1,7 +1,11 @@
-import socket
-import os
 import re
+import socket
 import subprocess
+
+
+def set_routes(a_records, interface):
+    for a_record in a_records:
+        set_route(resolv_a_record(a_record), interface)
 
 
 def resolv_a_record(a_record):
@@ -22,8 +26,7 @@ def get_default_route():
 
 
 def get_current_default_interface():
-    current_default_route = get_default_route()
-    return re.search('interface: (.+)', current_default_route).group(1)
+    return re.search('interface: (.+)',  get_default_route()).group(1)
 
 
 def set_route(ip: str, interface: str):

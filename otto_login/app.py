@@ -1,44 +1,70 @@
 import argparse
+import os
 
-from .helper.login import LoginHandler
+from otto_login.helper import citrix
+from otto_login.helper import routes
+from otto_login.helper import github
+from otto_login.helper import cpfw
+
+from .helper.sts import StsHandler
+from .helper.iam import IamHandler
 from .helper.route53 import Route53Handler
-from .helper.routes import resolv_a_record
-from .helper.routes import get_current_default_interface
-from .helper.routes import set_default_interface
-from .helper.routes import set_route
 
 from otto_login import settings
 
 
 def run():
+    check_tools()
+
     parser = argparse.ArgumentParser(description='otto-login')
 
     parser.add_argument('-v', dest='vpn', action='store_true', default=False, help='connect to vpn')
     parser.add_argument('-r', dest='rotate', action='store_true', default=False, help='rotate access keys')
-    parser.add_argument('-a', dest='aws_arecords', action='store_true', default=False, help='get aws ARecords')
     parser.add_argument('-o', dest='record_file', default=None, help='get ARecords from file')
     parser.add_argument('-f', dest='firewall', action='store_true', default=False, help='firewall login')
+    parser.add_argument('-c', dest='checkout', action='store_true', default=False, help='checkout all git repos')
 
     options = parser.parse_args()
+    sts = StsHandler()
+    aws_root_session = sts.get_root_session()
 
-    login_handler = LoginHandler()
+    if options.vpn:
+        citrix.start()
 
-    if login_handler.check_session_token():
-        assume_session = login_handler.get_profile_session(settings.intermediate_profile)
-    else:
-        token = input("Enter MFA-Token: ")
-        session_credentials = login_handler.get_session_token(token)['Credentials']
-        assume_session = login_handler.get_credentials_session(session_credentials)
+        vpn_interface = routes.get_current_default_interface()
 
-    vpn_interface = get_current_default_interface()
-    set_default_interface(settings.default_interface)
+        routes.set_default_interface(settings.default_interface)
 
-    for env, account in settings.accounts.items():
-        assume_credentials = login_handler.assume_role(assume_session, account)['Credentials']
-        run_session = login_handler.get_credentials_session(assume_credentials)
+        for env, account in settings.accounts.items():
+            assume_credentials = sts.assume_role(aws_root_session, account)['Credentials']
+            run_session = sts.get_credentials_session(assume_credentials)
 
-        for a_record in Route53Handler(run_session).arecords(env):
-            ip = resolv_a_record(a_record)
-            if ip is not None:
-                set_route(ip, vpn_interface)
+            routes.set_routes(Route53Handler(run_session).arecords(env), vpn_interface)
 
+        if options.record_file:
+            routes.set_routes(records_from_file(options.record_file), vpn_interface)
+
+    if options.rotate:
+        IamHandler(aws_root_session).rotate_access_keys()
+
+    if options.checkout:
+        github.clone_github_repos()
+
+    if options.firewall:
+        cpfw.login()
+
+
+def check_tools():
+    for tool in settings.required_tool:
+        if os.system(f'which {tool} > /dev/null') > 0:
+            print(f'{tool} not found, please install')
+            exit(1)
+
+
+def records_from_file(file):
+    result = list()
+    with open(file) as fp:
+        for _, line in enumerate(fp):
+            result.append(line.strip())
+
+    return result
