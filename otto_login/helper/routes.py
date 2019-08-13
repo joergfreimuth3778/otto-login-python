@@ -5,7 +5,9 @@ import subprocess
 
 def set_routes(a_records, interface):
     for a_record in a_records:
-        set_route(resolv_a_record(a_record), interface)
+        ip = resolv_a_record(a_record)
+        if ip is not None:
+            set_route(ip, interface)
 
 
 def resolv_a_record(a_record):

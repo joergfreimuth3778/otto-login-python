@@ -26,7 +26,11 @@ def run():
 
     options = parser.parse_args()
     sts = StsHandler()
-    aws_root_session = sts.get_root_session()
+    aws_root_session, root_credentials = sts.get_root_session()
+
+    sessions_to_save = {
+        settings.root_session_profile: root_credentials
+    }
 
     if options.vpn:
         citrix.start()
@@ -39,7 +43,11 @@ def run():
             assume_credentials = sts.assume_role(aws_root_session, account)['Credentials']
             run_session = sts.get_credentials_session(assume_credentials)
 
+            sessions_to_save[env] = run_session.get_credentials()
+
             routes.set_routes(Route53Handler(run_session).arecords(env), vpn_interface)
+
+        sts.save_sessions(sessions_to_save)
 
         if options.record_file:
             routes.set_routes(records_from_file(options.record_file), vpn_interface)

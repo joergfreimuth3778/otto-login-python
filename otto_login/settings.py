@@ -6,9 +6,10 @@ accounts = {
     'develop': 973172234831,
     'infra': 967223975844,
 }
+region = 'eu-central-1'
 aws_user = os.environ["OCN_USER"]
 mfa_device = f'arn:aws:iam::{ec_account}:mfa/{aws_user}'
-intermediate_profile = 'session-token'
+root_session_profile = 'session-token'
 credentials_file = f'{os.environ["HOME"]}/.aws/credentials'
 role = 'admin'
 default_interface = 'en0'

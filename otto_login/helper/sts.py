@@ -1,3 +1,5 @@
+import re
+
 import boto3
 
 from otto_login import settings
@@ -9,13 +11,14 @@ class StsHandler:
 
     def get_root_session(self):
         if self.check_session_token():
-            root_session = self.get_profile_session(settings.intermediate_profile)
+            root_session = self.get_profile_session(settings.root_session_profile)
+            session_credentials = root_session.get_credentials()
         else:
             token = input("Enter MFA-Token: ")
             session_credentials = self.get_session_token(token)['Credentials']
             root_session = self.get_credentials_session(session_credentials)
 
-        return root_session
+        return root_session, session_credentials
 
     def get_session_token(self, mfa_token: str):
         return self.sts.get_session_token(
@@ -23,12 +26,24 @@ class StsHandler:
             TokenCode=mfa_token
         )
 
+    def save_sessions(self, sessions_to_save):
+        content = self.get_login_session()
+        for sessions_name, credentials in sessions_to_save.items():
+            content += f"\n\n" \
+                       f"[{sessions_name}]\n" \
+                       f"region = {settings.region}\n" \
+                       f"aws_access_key_id = {credentials.access_key}\n" \
+                       f"aws_secret_access_key = {credentials.secret_key}\n" \
+                       f"aws_session_token = {credentials.token}"
+
+        self.write_credentials_file(content)
+
     # noinspection PyBroadException
     @staticmethod
     def check_session_token():
         try:
             boto3.Session(
-                profile_name=settings.intermediate_profile
+                profile_name=settings.root_session_profile
             ).client('sts').get_caller_identity()
             return True
         except:
@@ -54,3 +69,16 @@ class StsHandler:
             RoleArn=f'arn:aws:iam::{account}:role/{settings.role}',
             RoleSessionName='s3-sync'
         )
+
+    @staticmethod
+    def write_credentials_file(content):
+        f = open(settings.credentials_file, 'w')
+        f.write(content)
+        f.close()
+
+    @staticmethod
+    def get_login_session():
+        with open(settings.credentials_file, 'r') as content_file:
+            content = content_file.read()
+
+        return re.search("(\[default\]\n+aws_access_key_id.*=.+\n+aws_secret_access_key.*=.+)\n", content).group(1)

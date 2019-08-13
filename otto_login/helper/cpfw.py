@@ -16,7 +16,6 @@ def get_login_params():
     url = f'{settings.firewall_url}/RSASettings'
     return requests.get(url, verify=False).json()
 
-
 def crypt(login_params, password):
 
     # public_key = key.publickey().exportKey('PEM')
