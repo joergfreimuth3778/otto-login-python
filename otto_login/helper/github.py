@@ -90,9 +90,21 @@ def get_repos(page):
         f'/teams/'
         f'{settings.github_team_id}/'
         f'repos?'
-        f'access_token={settings.github_token}&'
+        f'access_token={token()}&'
         f'per_page={page_size}&'
         f'page={page}'
     )
 
     return {r['name'] for r in result.json()}
+
+
+def token():
+    try:
+        process = subprocess.run(settings.github_token.split(),
+                                 check=True,
+                                 stdout=subprocess.PIPE,
+                                 universal_newlines=True)
+
+        return process.stdout.strip()
+    except:
+        return settings.github_token

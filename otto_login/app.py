@@ -23,6 +23,7 @@ def run():
     parser.add_argument('-o', dest='record_file', default=None, help='get ARecords from file')
     parser.add_argument('-f', dest='firewall', action='store_true', default=False, help='firewall login')
     parser.add_argument('-c', dest='checkout', action='store_true', default=False, help='checkout all git repos')
+    parser.add_argument('-d', dest='routes', action='store_true', default=False, help='change default route')
 
     options = parser.parse_args()
 
@@ -36,9 +37,10 @@ def run():
 
         vpn_interface = routes.get_current_default_interface()
 
-        routes.set_default_interface(settings.default_interface)
+        if options.routes:
+            routes.set_default_interface(settings.default_interface)
 
-        routes.set_route(settings.otto_net, vpn_interface)
+            routes.set_route(settings.otto_net, vpn_interface)
 
         sessions_to_save = {
             settings.root_session_profile: aws_root_credentials
@@ -50,8 +52,9 @@ def run():
 
             sessions_to_save[env] = run_session.get_credentials()
 
-            print(f'Get A-Records from {env}')
-            routes.set_routes(Route53Handler(run_session).arecords(env), vpn_interface)
+            if options.routes:
+                print(f'Get A-Records from {env}')
+                routes.set_routes(Route53Handler(run_session).arecords(env), vpn_interface)
 
         sts.save_sessions(sessions_to_save)
 

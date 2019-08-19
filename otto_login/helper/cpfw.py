@@ -12,7 +12,7 @@ def login():
 
 
 def ocn_password():
-    return run_cmd('security find-generic-password -j ocn -w')
+    return run_cmd(settings.ocn_pass)
 
 
 def run_cmd(cmd):

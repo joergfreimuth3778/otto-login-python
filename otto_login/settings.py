@@ -22,7 +22,6 @@ github_org = 'otto-ec'
 github_team_id = 2770943
 github_base = 'github.com'
 github_api = f'https://api.{github_base}'
-github_token = os.environ['GITHUB_TOKEN']
 github_repo_prefix = 'tr_'
 
 firewall_domain = 'fwauth.ov.otto.de'
@@ -33,3 +32,5 @@ default_interface = 'en0'
 citrix_client = "/Applications/Citrix\\ SSO.app/Contents/MacOS/Citrix\\ SSO"
 local_repo_path = f'{os.environ["HOME"]}/Otto/workspace/tracking'
 firewall_login_tool = 'cpfw-login'
+ocn_pass = 'security find-generic-password -j ocn -w'
+github_token = 'security find-generic-password -j github -w'
