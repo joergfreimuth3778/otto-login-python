@@ -94,8 +94,11 @@ def get_repos(page):
         f'per_page={page_size}&'
         f'page={page}'
     )
-
-    return {r['name'] for r in result.json()}
+    if result.status_code == 200:
+        return {r['name'] for r in result.json()}
+    else:
+        print(f'ERROR fetching git repos ({result.status_code})')
+        exit(1)
 
 
 def token():
@@ -103,6 +106,7 @@ def token():
         process = subprocess.run(settings.github_token.split(),
                                  check=True,
                                  stdout=subprocess.PIPE,
+                                 stderr=subprocess.DEVNULL,
                                  universal_newlines=True)
 
         return process.stdout.strip()
