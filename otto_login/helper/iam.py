@@ -29,12 +29,12 @@ class IamHandler:
 
     def __create_user_access_key(self):
         return self.iam.create_access_key(
-            UserName=settings.aws_user
+            UserName=settings.ocn_user
         )
 
     def __delete_user_access_key(self, key):
         self.iam.delete_access_key(
-            UserName=settings.aws_user,
+            UserName=settings.ocn_user,
             AccessKeyId=key
         )
 

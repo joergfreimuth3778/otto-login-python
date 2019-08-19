@@ -12,25 +12,24 @@ class StsHandler:
     def get_root_session(self):
         if self.check_session_token():
             root_session = self.get_profile_session(settings.root_session_profile)
-            session_credentials = root_session.get_credentials()
         else:
             token = input("Enter MFA-Token: ")
-            session_credentials = self.get_session_token(token)['Credentials']
-            root_session = self.get_credentials_session(session_credentials)
+            credentials = self.get_root_session_token(token)['Credentials']
+            root_session = self.get_credentials_session(credentials)
 
-        return root_session, session_credentials
+        return root_session, root_session.get_credentials()
 
-    def get_session_token(self, mfa_token: str):
+    def get_root_session_token(self, mfa_token: str):
         return self.sts.get_session_token(
             SerialNumber=settings.mfa_device,
-            TokenCode=mfa_token
+            TokenCode=str(mfa_token)
         )
 
     def save_sessions(self, sessions_to_save):
         content = self.get_login_session()
         for sessions_name, credentials in sessions_to_save.items():
             content += f"\n\n" \
-                       f"[{sessions_name}]\n" \
+                       f"[{self.profile_name(sessions_name)}]\n" \
                        f"region = {settings.region}\n" \
                        f"aws_access_key_id = {credentials.access_key}\n" \
                        f"aws_secret_access_key = {credentials.secret_key}\n" \
@@ -82,3 +81,9 @@ class StsHandler:
             content = content_file.read()
 
         return re.search("(\[default\]\n+aws_access_key_id.*=.+\n+aws_secret_access_key.*=.+)\n", content).group(1)
+
+    @staticmethod
+    def profile_name(env):
+        if env == 'develop':
+            return 'nonlive'
+        return env

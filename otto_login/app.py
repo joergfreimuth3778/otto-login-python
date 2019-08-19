@@ -25,12 +25,10 @@ def run():
     parser.add_argument('-c', dest='checkout', action='store_true', default=False, help='checkout all git repos')
 
     options = parser.parse_args()
-    sts = StsHandler()
-    aws_root_session, root_credentials = sts.get_root_session()
 
-    sessions_to_save = {
-        settings.root_session_profile: root_credentials
-    }
+    sts = StsHandler()
+
+    aws_root_session, aws_root_credentials = sts.get_root_session()
 
     if options.vpn:
         citrix.start()
@@ -38,6 +36,12 @@ def run():
         vpn_interface = routes.get_current_default_interface()
 
         routes.set_default_interface(settings.default_interface)
+
+        routes.set_route(settings.otto_net, vpn_interface)
+
+        sessions_to_save = {
+            settings.root_session_profile: aws_root_credentials
+        }
 
         for env, account in settings.accounts.items():
             assume_credentials = sts.assume_role(aws_root_session, account)['Credentials']
@@ -59,11 +63,12 @@ def run():
         github.clone_github_repos()
 
     if options.firewall:
+        check_tools({settings.firewall_login_tool})
         cpfw.login()
 
 
-def check_tools():
-    for tool in settings.required_tool:
+def check_tools(tools = settings.required_tools):
+    for tool in tools:
         if os.system(f'which {tool} > /dev/null') > 0:
             print(f'{tool} not found, please install')
             exit(1)

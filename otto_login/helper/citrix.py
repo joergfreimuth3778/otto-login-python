@@ -18,7 +18,7 @@ def wait_for_connect():
 
 
 def kill_all_running_instances():
-    run_cmd(f'killall {settings.citrix_client}')
+    run_cmd(f"killall {settings.citrix_client.split('/')[-1]}")
 
 
 def run_cmd(cmd):

@@ -22,6 +22,8 @@ def clone_github_repos():
         if i % 30 == 0:
             threads = handle_threads(threads)
 
+    handle_threads(threads)
+
 
 def handle_threads(threads):
     for thread in threads:
