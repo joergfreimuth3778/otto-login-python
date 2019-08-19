@@ -42,7 +42,11 @@ def set_route(ip: str, interface: str):
 
 def run_cmd(cmd):
     try:
-        process = subprocess.run(cmd.split(), check=True, stdout=subprocess.PIPE, universal_newlines=True)
+        process = subprocess.run(cmd.split(),
+                                 check=True,
+                                 stdout=subprocess.PIPE,
+                                 universal_newlines=True,
+                                 stderr=subprocess.DEVNULL)
         return process.stdout
     except:
         raise

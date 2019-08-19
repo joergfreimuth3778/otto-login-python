@@ -7,7 +7,7 @@ from otto_login import settings
 
 def start():
     kill_all_running_instances()
-    run_cmd(f'nohup {settings.citrix_client} &')
+    run_cmd(f'nohup {settings.citrix_client} > /dev/null 2>&1 &')
     wait_for_connect()
 
 
@@ -18,7 +18,7 @@ def wait_for_connect():
 
 
 def kill_all_running_instances():
-    run_cmd(f"killall {settings.citrix_client.split('/')[-1]}")
+    run_cmd(f"killall {settings.citrix_client.split('/')[-1]} > /dev/null 2>&1")
 
 
 def run_cmd(cmd):

@@ -6,23 +6,36 @@ from otto_login import settings
 
 
 def clone_github_repos():
-    i = 0
     threads = []
+    all_threads = []
 
-    for repo in get_all_repos():
+    repos = get_all_repos()
+
+    for repo in repos:
         repo_path = path(repo)
 
         if os.path.exists(repo_path):
-            threads.append(pull_repo(repo_path))
+            thread = pull_repo(repo_path)
         else:
-            threads.append(clone_repo(repo_path, repo))
+            thread = clone_repo(repo_path, repo)
 
-        i += 1
+        threads.append(thread)
+        all_threads.append(thread)
 
-        if i % 30 == 0:
+        if len(threads) % 30 == 0:
             threads = handle_threads(threads)
+            print(f'  finished {len(all_threads)} from {len(repos)}')
 
     handle_threads(threads)
+    print(f'  finished {len(all_threads)} from {len(repos)}')
+
+    check_result(all_threads)
+
+
+def check_result(threads):
+    for thread in threads:
+        if thread.returncode is None or thread.returncode > 0:
+            print(f'  ERROR running {" ".join(thread.args)}')
 
 
 def handle_threads(threads):
@@ -43,13 +56,15 @@ def path(repo):
 
 def pull_repo(local_path):
     return subprocess.Popen(
-        ['git', '-C', local_path, 'pull', '-r']
+        ['git', '-C', local_path, 'pull', '-q', '-r'],
+        stderr=subprocess.DEVNULL
     )
 
 
 def clone_repo(local_path, repo):
     return subprocess.Popen(
-        ['git', 'clone', f'git@{settings.github_base}/{settings.github_org}/{repo}', local_path]
+        ['git', 'clone', f'git@{settings.github_base}/{settings.github_org}/{repo}', local_path],
+        stderr=subprocess.DEVNULL
     )
 
 

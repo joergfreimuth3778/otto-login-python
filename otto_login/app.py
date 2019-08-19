@@ -31,6 +31,7 @@ def run():
     aws_root_session, aws_root_credentials = sts.get_root_session()
 
     if options.vpn:
+        print(f'Start VPN application')
         citrix.start()
 
         vpn_interface = routes.get_current_default_interface()
@@ -49,17 +50,21 @@ def run():
 
             sessions_to_save[env] = run_session.get_credentials()
 
+            print(f'Get A-Records from {env}')
             routes.set_routes(Route53Handler(run_session).arecords(env), vpn_interface)
 
         sts.save_sessions(sessions_to_save)
 
         if options.record_file:
+            print(f'Get A-Records from {options.record_file}')
             routes.set_routes(records_from_file(options.record_file), vpn_interface)
 
     if options.rotate:
+        print(f'Rotate AccessKeys')
         IamHandler(aws_root_session).rotate_access_keys()
 
     if options.checkout:
+        print('Pull or clone git repos')
         github.clone_github_repos()
 
     if options.firewall:
