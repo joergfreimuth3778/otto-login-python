@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(dirname "$0")"
+
+pushd ${SCRIPT_DIR}/../ > /dev/null
+
+if [[ $# == 0 ]]; then
+    python3 -m otto_login -h
+else
+    python3 -m otto_login $@
+fi
+
+popd > /dev/null
