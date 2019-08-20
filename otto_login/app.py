@@ -39,7 +39,6 @@ def run():
 
         if options.routes:
             routes.set_default_interface(settings.default_interface)
-
             routes.set_route(settings.otto_net, vpn_interface)
 
         sessions_to_save = {
