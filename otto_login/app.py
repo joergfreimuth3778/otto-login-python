@@ -46,6 +46,7 @@ def run():
         }
 
         for env, account in settings.accounts.items():
+            print(f'Create AWS-Session for {env}')
             assume_credentials = sts.assume_role(aws_root_session, account)['Credentials']
             run_session = sts.get_credentials_session(assume_credentials)
 

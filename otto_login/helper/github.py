@@ -63,7 +63,7 @@ def pull_repo(local_path):
 
 def clone_repo(local_path, repo):
     return subprocess.Popen(
-        ['git', 'clone', f'git@{settings.github_base}/{settings.github_org}/{repo}', local_path],
+        ['git', 'clone', f'git@{settings.github_base}:{settings.github_org}/{repo}', local_path],
         stderr=subprocess.DEVNULL
     )
 
