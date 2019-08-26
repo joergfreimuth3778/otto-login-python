@@ -58,9 +58,12 @@ def run():
 
         sts.save_sessions(sessions_to_save)
 
-        if options.record_file:
+    if options.record_file:
+        if routes.check_vpn_connection():
             print(f'Get A-Records from {options.record_file}')
-            routes.set_routes(records_from_file(options.record_file), vpn_interface)
+            routes.set_routes(records_from_file(options.record_file), routes.get_vpn_interface())
+        else:
+            print('No active VPN-Connection')
 
     if options.rotate:
         print(f'Rotate AccessKeys')
