@@ -29,11 +29,16 @@ firewall_url = f'https://{firewall_domain}'
 
 # Change this for your ENV
 default_interface = 'en0'
+
 citrix_client = "/Applications/Citrix\\ SSO.app/Contents/MacOS/Citrix\\ SSO"
+
 local_repo_path = f'{os.environ["HOME"]}/Otto/workspace/tracking'
+
 firewall_login_tool = 'cpfw-login'
+
 ocn_pass = 'security find-generic-password -j ocn -w'
 github_token = 'security find-generic-password -j github -w'
+
 vpn_disconnect = 'networksetup -setnetworkserviceenabled Otto off'
 vpn_check = 'networksetup -getnetworkserviceenabled Otto'
 vpn_check_result = 'Enabled'
