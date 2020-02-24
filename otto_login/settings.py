@@ -38,7 +38,5 @@ firewall_login_tool = 'cpfw-login'
 
 ocn_pass = 'security find-generic-password -j ocn -w'
 github_token = 'security find-generic-password -j github -w'
-
-vpn_disconnect = 'networksetup -setnetworkserviceenabled Otto off'
-vpn_check = 'networksetup -getnetworkserviceenabled Otto'
-vpn_check_result = 'Enabled'
+vpn_check_result = 'CONNECTED'
+vpn_config_name = 'otto'

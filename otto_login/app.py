@@ -1,8 +1,8 @@
 import argparse
 import os
 
-from otto_login.helper import citrix
 from otto_login.helper import routes
+from otto_login.helper import vpn
 from otto_login.helper import github
 from otto_login.helper import cpfw
 
@@ -32,14 +32,8 @@ def run():
     aws_root_session, aws_root_credentials = sts.get_root_session()
 
     if options.vpn:
-        print(f'Start VPN application')
-        citrix.start()
-
-        vpn_interface = routes.get_current_default_interface()
-
-        if options.routes:
-            routes.set_default_interface(settings.default_interface)
-            routes.set_route(settings.otto_net, vpn_interface)
+        print(f'Start VPN')
+        vpn.start()
 
         sessions_to_save = {
             settings.root_session_profile: aws_root_credentials
@@ -54,14 +48,14 @@ def run():
 
             if options.routes:
                 print(f'Get A-Records from {env}')
-                routes.set_routes(Route53Handler(run_session).arecords(env), vpn_interface)
+                routes.set_routes(Route53Handler(run_session).arecords(env))
 
         sts.save_sessions(sessions_to_save)
 
     if options.record_file:
-        if routes.check_vpn_connection():
+        if vpn.check():
             print(f'Get A-Records from {options.record_file}')
-            routes.set_routes(records_from_file(options.record_file), routes.get_vpn_interface())
+            routes.set_routes(records_from_file(options.record_file))
         else:
             print('No active VPN-Connection')
 
