@@ -27,11 +27,6 @@ github_repo_prefix = 'tr_'
 firewall_domain = 'fwauth.ov.otto.de'
 firewall_url = f'https://{firewall_domain}'
 
-# Change this for your ENV
-default_interface = 'en0'
-
-citrix_client = "/Applications/Citrix\\ SSO.app/Contents/MacOS/Citrix\\ SSO"
-
 local_repo_path = f'{os.environ["HOME"]}/Otto/workspace/tracking'
 
 firewall_login_tool = 'cpfw-login'
