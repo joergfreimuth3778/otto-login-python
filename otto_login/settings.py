@@ -27,7 +27,7 @@ github_repo_prefix = 'tr_'
 firewall_domain = 'fwauth.ov.otto.de'
 firewall_url = f'https://{firewall_domain}'
 
-local_repo_path = f'{os.environ["HOME"]}/Otto/workspace/tracking'
+local_repo_path = f'{os.environ["REPO_DIR"]}'
 
 firewall_login_tool = 'cpfw-login'
 
