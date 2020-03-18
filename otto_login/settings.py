@@ -33,5 +33,6 @@ firewall_login_tool = 'cpfw-login'
 
 ocn_pass = 'security find-generic-password -j ocn -w'
 github_token = 'security find-generic-password -j github -w'
+sudo_pass = 'security find-generic-password -j sudo -w'
 vpn_check_result = 'CONNECTED'
 vpn_config_name = 'ottogroup'

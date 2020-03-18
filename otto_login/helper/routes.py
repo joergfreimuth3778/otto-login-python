@@ -27,11 +27,18 @@ def set_route(ip: str, interface: str):
     if '/' in ip:
         ip_type = 'net'
 
-    run_cmd(f'sudo -S route add -{ip_type} {ip} -interface {interface}')
+    run_pipe_cmd(f'{settings.sudo_pass} | sudo -S route add -{ip_type} {ip} -interface {interface}')
 
 
 def get_vpn_interface():
     return re.search('interface: (.+)',  run_cmd(f'route get {settings.otto_net}')).group(1)
+
+
+def run_pipe_cmd(cmd):
+    subprocess.Popen(cmd,
+                     shell=True,
+                     stdout=subprocess.PIPE,
+                     stderr=subprocess.STDOUT)
 
 
 def run_cmd(cmd):
