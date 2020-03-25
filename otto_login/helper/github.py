@@ -95,7 +95,7 @@ def get_repos(page):
         f'page={page}'
     )
     if result.status_code == 200:
-        return {r['name'] for r in result.json()}
+        return {r['name'] for r in result.json() if not r['archived']}
     else:
         print(f'ERROR fetching git repos ({result.status_code})')
         exit(1)

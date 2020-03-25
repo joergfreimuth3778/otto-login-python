@@ -16,7 +16,9 @@ root_session_profile = 'session-token'
 credentials_file = f'{os.environ["HOME"]}/.aws/credentials'
 role = 'admin'
 
-required_tools = ('route', 'aws', 'git')
+firewall_login_tool = 'cpfw-login'
+
+required_tools = ('route', 'aws', 'git', 'security', firewall_login_tool)
 
 github_org = 'otto-ec'
 github_team_id = 2770943
@@ -29,7 +31,6 @@ firewall_url = f'https://{firewall_domain}'
 
 local_repo_path = f'{os.environ["REPO_DIR"]}'
 
-firewall_login_tool = 'cpfw-login'
 
 ocn_pass = 'security find-generic-password -j ocn -w'
 github_token = 'security find-generic-password -j github -w'
