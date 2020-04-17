@@ -6,10 +6,11 @@ from otto_login import settings
 
 
 def set_routes(a_records):
+    vpn_interface = get_vpn_interface()
     for a_record in a_records:
         ip = resolv_a_record(a_record)
         if ip is not None:
-            set_route(ip, get_vpn_interface())
+            set_route(ip, vpn_interface)
 
 
 def resolv_a_record(a_record):

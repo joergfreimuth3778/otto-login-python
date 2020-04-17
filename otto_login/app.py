@@ -9,6 +9,7 @@ from otto_login.helper import cpfw
 from .helper.sts import StsHandler
 from .helper.iam import IamHandler
 from .helper.route53 import Route53Handler
+from .helper.ec2 import Ec2Handler
 
 from otto_login import settings
 
@@ -43,10 +44,15 @@ def run():
             print(f'Create AWS-Session for {env}')
             assume_credentials = sts.assume_role(aws_root_session, account)['Credentials']
             run_session = sts.get_credentials_session(assume_credentials)
+            ec2_handler = Ec2Handler(run_session)
 
             sessions_to_save[env] = run_session.get_credentials()
 
             if options.routes:
+                for reservation in ec2_handler.find_instances_by_service_tag('jumphost'):
+                    for instance in reservation['Instances']:
+                        routes.set_routes({instance['PublicDnsName']})
+
                 print(f'Get A-Records from {env}')
                 routes.set_routes(Route53Handler(run_session).arecords(env))
 

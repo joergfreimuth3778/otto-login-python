@@ -1,6 +1,7 @@
 import re
 
 import boto3
+import subprocess
 
 from otto_login import settings
 
@@ -13,7 +14,8 @@ class StsHandler:
         if self.check_session_token():
             root_session = self.get_profile_session(settings.root_session_profile)
         else:
-            token = input("Enter MFA-Token: ")
+            op_session = self.run_cmd(settings.op_signin)
+            token = self.run_cmd(f"{settings.op_aws_token} {op_session}").strip()
             credentials = self.get_root_session_token(token)['Credentials']
             root_session = self.get_credentials_session(credentials)
 
@@ -37,7 +39,18 @@ class StsHandler:
 
         self.write_credentials_file(content)
 
-    # noinspection PyBroadException
+    @staticmethod
+    def run_cmd(cmd):
+        try:
+            process = subprocess.run(cmd.split(),
+                                     check=True,
+                                     stdout=subprocess.PIPE,
+                                     universal_newlines=True,
+                                     stderr=subprocess.DEVNULL)
+            return process.stdout
+        except:
+            raise
+
     @staticmethod
     def check_session_token():
         try:
