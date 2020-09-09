@@ -32,7 +32,7 @@ firewall_url = f'https://{firewall_domain}'
 local_repo_path = f'{os.environ["REPO_DIR"]}'
 
 
-ocn_pass = 'security find-generic-password -j ocn -w'
+ocn_pass = 'security find-generic-password -j ocn-pwd -w'
 github_token = 'security find-generic-password -j github -w'
 sudo_pass = 'security find-generic-password -j sudo -w'
 op_signin = 'op signin my --raw'

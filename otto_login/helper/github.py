@@ -90,9 +90,9 @@ def get_repos(page):
         f'/teams/'
         f'{settings.github_team_id}/'
         f'repos?'
-        f'access_token={token()}&'
         f'per_page={page_size}&'
-        f'page={page}'
+        f'page={page}',
+        headers={'Authorization': f'token {token()}'}
     )
     if result.status_code == 200:
         return {r['name'] for r in result.json() if not r['archived']}
