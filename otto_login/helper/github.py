@@ -1,6 +1,8 @@
 import os
-import requests
 import subprocess
+import shutil
+
+import requests
 
 from otto_login import settings
 
@@ -9,9 +11,9 @@ def clone_github_repos():
     threads = []
     all_threads = []
 
-    repos = get_all_repos()
+    to_pull_or_clone, archived_repos = repos_to_pull_or_clone()
 
-    for repo in repos:
+    for repo in to_pull_or_clone:
         repo_path = path(repo)
 
         if os.path.exists(repo_path):
@@ -24,12 +26,22 @@ def clone_github_repos():
 
         if len(threads) % 30 == 0:
             threads = handle_threads(threads)
-            print(f'  finished {len(all_threads)} from {len(repos)}')
+            print(f'  finished {len(all_threads)} from {len(to_pull_or_clone)}')
 
     handle_threads(threads)
-    print(f'  finished {len(all_threads)} from {len(repos)}')
+    print(f'  finished {len(all_threads)} from {len(to_pull_or_clone)}')
 
     check_result(all_threads)
+
+    cleanup(archived_repos)
+
+
+def repos_to_pull_or_clone():
+    all_repos = get_all_repos()
+    active_repos = {r['name'] for r in all_repos if not r['archived']}
+    archived_repos = set(map(lambda r: r['name'], all_repos)) - active_repos
+
+    return active_repos, archived_repos
 
 
 def check_result(threads):
@@ -51,7 +63,15 @@ def handle_threads(threads):
 
 
 def path(repo):
-    return f'{settings.local_repo_path}/{str(repo)[len(settings.github_repo_prefix):]}'
+    return f'{settings.local_repo_path}/{str(repo).replace(settings.github_repo_prefix,"")}'
+
+
+def cleanup(archived_repos):
+    for repo in archived_repos:
+        repo_path = path(repo)
+        if os.path.exists(repo_path):
+            print(f"remove {repo_path}")
+            shutil.rmtree(repo_path)
 
 
 def pull_repo(local_path):
@@ -70,12 +90,12 @@ def clone_repo(local_path, repo):
 
 def get_all_repos():
     page = 1
-    all_repos = set()
+    all_repos = []
 
     repos = get_repos(page)
 
     while len(repos) > 0:
-        all_repos.update(repos)
+        all_repos += repos
         page += 1
         repos = get_repos(page)
 
@@ -95,7 +115,7 @@ def get_repos(page):
         headers={'Authorization': f'token {token()}'}
     )
     if result.status_code == 200:
-        return {r['name'] for r in result.json() if not r['archived']}
+        return result.json()
     else:
         print(f'ERROR fetching git repos ({result.status_code})')
         exit(1)

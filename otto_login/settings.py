@@ -30,6 +30,7 @@ firewall_domain = 'fwauth.ov.otto.de'
 firewall_url = f'https://{firewall_domain}'
 
 local_repo_path = f'{os.environ["REPO_DIR"]}'
+archived_repo_path = f'{local_repo_path}/archived'
 
 
 ocn_pass = 'security find-generic-password -j ocn-pwd -w'
