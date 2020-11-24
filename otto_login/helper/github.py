@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import shutil
 
@@ -34,6 +35,31 @@ def clone_github_repos():
     check_result(all_threads)
 
     cleanup(archived_repos)
+
+    link_files(to_pull_or_clone)
+
+
+def link_files(all_tr_repos):
+    for repo in all_tr_repos:
+        link_target=path(repo)
+        for link_source in settings.files_to_link:
+            file_or_directory = os.path.basename(link_source)
+            if not os.path.exists(f"{link_target}/{file_or_directory}"):
+                if file_or_directory == 'javaagent' and not akkamann(link_target):
+                    continue
+
+                os.symlink(link_source, f"{link_target}/{file_or_directory}")
+
+
+def akkamann(repo_path):
+    sbt_file = f'{repo_path}/build.sbt'
+    if os.path.isfile(sbt_file):
+        with open(sbt_file, 'r') as file:
+            data = file.read()
+
+        return re.search('de.otto.tracking.akkamann', data) is not None
+    else:
+        return False
 
 
 def repos_to_pull_or_clone():
@@ -99,7 +125,7 @@ def get_all_repos():
         page += 1
         repos = get_repos(page)
 
-    return all_repos
+    return list(filter(lambda r: r['name'].startswith(settings.github_repo_prefix), all_repos))
 
 
 def get_repos(page):
