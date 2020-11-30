@@ -32,8 +32,6 @@ firewall_url = f'https://{firewall_domain}'
 local_repo_path = '/Users/jfreimuth/Otto/workspace/tracking'
 archived_repo_path = f'{local_repo_path}/archived'
 files_to_link = [
-    f"{local_repo_path}/tools/conventionalcommit.coauthors",
-    f"{local_repo_path}/tools/conventionalcommit.json",
     f"{local_repo_path}/tools/javaagent",
     f"{local_repo_path}/editor-config/.editorconfig",
 ]

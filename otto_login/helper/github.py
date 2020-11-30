@@ -41,14 +41,15 @@ def clone_github_repos():
 
 def link_files(all_tr_repos):
     for repo in all_tr_repos:
-        link_target=path(repo)
+        link_target = path(repo)
         for link_source in settings.files_to_link:
             file_or_directory = os.path.basename(link_source)
-            if not os.path.exists(f"{link_target}/{file_or_directory}"):
+            full_link_target = f"{link_target}/{file_or_directory}"
+            if not os.path.exists(full_link_target):
                 if file_or_directory == 'javaagent' and not akkamann(link_target):
                     continue
 
-                os.symlink(link_source, f"{link_target}/{file_or_directory}")
+                os.symlink(link_source, full_link_target)
 
 
 def akkamann(repo_path):
