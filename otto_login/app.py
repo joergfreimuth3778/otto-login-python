@@ -9,7 +9,6 @@ from otto_login.helper import cpfw
 from .helper.sts import StsHandler
 from .helper.iam import IamHandler
 from .helper.route53 import Route53Handler
-from .helper.ec2 import Ec2Handler
 
 from otto_login import settings
 
@@ -20,6 +19,7 @@ def run():
     parser = argparse.ArgumentParser(description='otto-login')
 
     parser.add_argument('-v', dest='vpn', action='store_true', default=False, help='connect to vpn')
+    parser.add_argument('-a', dest='aws', action='store_true', default=False, help='open aws sessions')
     parser.add_argument('-r', dest='rotate', action='store_true', default=False, help='rotate access keys')
     parser.add_argument('-o', dest='record_file', default=None, help='get ARecords from file')
     parser.add_argument('-f', dest='firewall', action='store_true', default=False, help='firewall login')
@@ -30,11 +30,12 @@ def run():
 
     sts = StsHandler()
 
-    aws_root_session, aws_root_credentials = sts.get_root_session()
-
     if options.vpn:
         print(f'Start VPN')
         vpn.start()
+
+    if options.aws:
+        aws_root_session, aws_root_credentials = sts.get_root_session()
 
         sessions_to_save = {
             settings.root_session_profile: aws_root_credentials
@@ -44,19 +45,18 @@ def run():
             print(f'Create AWS-Session for {env}')
             assume_credentials = sts.assume_role(aws_root_session, account)['Credentials']
             run_session = sts.get_credentials_session(assume_credentials)
-            ec2_handler = Ec2Handler(run_session)
 
             sessions_to_save[env] = run_session.get_credentials()
 
             if options.routes:
-                for reservation in ec2_handler.find_instances_by_service_tag('jumphost'):
-                    for instance in reservation['Instances']:
-                        routes.set_routes({instance['PublicDnsName']})
-
                 print(f'Get A-Records from {env}')
                 routes.set_routes(Route53Handler(run_session).arecords(env))
 
         sts.save_sessions(sessions_to_save)
+
+        if options.rotate:
+            print(f'Rotate AccessKeys')
+            IamHandler(aws_root_session).rotate_access_keys()
 
     if options.record_file:
         if vpn.check():
@@ -64,10 +64,6 @@ def run():
             routes.set_routes(records_from_file(options.record_file))
         else:
             print('No active VPN-Connection')
-
-    if options.rotate:
-        print(f'Rotate AccessKeys')
-        IamHandler(aws_root_session).rotate_access_keys()
 
     if options.checkout:
         print('Pull or clone git repos')
@@ -78,7 +74,7 @@ def run():
         cpfw.login()
 
 
-def check_tools(tools = settings.required_tools):
+def check_tools(tools=settings.required_tools):
     for tool in tools:
         if os.system(f'which {tool} > /dev/null') > 0:
             print(f'{tool} not found, please install')

@@ -29,7 +29,7 @@ github_repo_prefix = 'tr_'
 firewall_domain = 'fwauth.ov.otto.de'
 firewall_url = f'https://{firewall_domain}'
 
-local_repo_path = '/Users/jfreimuth/Otto/workspace/tracking'
+local_repo_path = '/Users/jfreimut/Otto/workspace/tracking'
 archived_repo_path = f'{local_repo_path}/archived'
 files_to_link = [
     f"{local_repo_path}/tools/javaagent",
@@ -37,8 +37,7 @@ files_to_link = [
 ]
 
 ocn_pass = 'security find-generic-password -j ocn-pwd -w'
-github_token = 'security find-generic-password -j github -w'
-sudo_pass = 'security find-generic-password -j sudo -w'
+github_token = os.environ["GITHUB_TOKEN"]
 op_signin = 'op signin my --raw'
 op_aws_token = 'op get totp AWS-Otto --session '
 vpn_check_result = 'CONNECTED'
