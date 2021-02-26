@@ -30,10 +30,6 @@ def run():
 
     sts = StsHandler()
 
-    if options.vpn:
-        print(f'Start VPN')
-        vpn.start()
-
     if options.aws:
         aws_root_session, aws_root_credentials = sts.get_root_session()
 
@@ -65,6 +61,10 @@ def run():
         else:
             print('No active VPN-Connection')
 
+    if options.vpn:
+        print(f'Start VPN')
+        vpn.start()
+        
     if options.checkout:
         print('Pull or clone git repos')
         github.clone_github_repos()
