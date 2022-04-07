@@ -38,7 +38,8 @@ files_to_link = [
 
 ocn_pass = 'security find-generic-password -j ocn-pwd -w'
 github_token = os.environ["GITHUB_TOKEN"]
-op_signin = 'op signin my --raw'
-op_aws_token = 'op get totp AWS-Otto --session '
+op_signin = 'op signin --raw'
+op_aws_token = 'op item get AWS-Otto --field type=otp --format json --session '
 vpn_check_result = 'CONNECTED'
 vpn_config_name = 'ottogroup'
+aws_internal_security_group = 'alb-ENV-https-internal'

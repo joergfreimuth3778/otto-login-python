@@ -1,6 +1,7 @@
 import re
 
 import boto3
+import json
 import subprocess
 
 from otto_login import settings
@@ -15,7 +16,8 @@ class StsHandler:
             root_session = self.get_profile_session(settings.root_session_profile)
         else:
             op_session = self.run_cmd(settings.op_signin)
-            token = self.run_cmd(f"{settings.op_aws_token} {op_session}").strip()
+            op_result = self.run_cmd(f"{settings.op_aws_token} {op_session}").strip()
+            token = json.loads(op_result)['totp']
             credentials = self.get_root_session_token(token)['Credentials']
             root_session = self.get_credentials_session(credentials)
 

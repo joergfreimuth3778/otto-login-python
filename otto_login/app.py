@@ -9,6 +9,7 @@ from otto_login.helper import cpfw
 from .helper.sts import StsHandler
 from .helper.iam import IamHandler
 from .helper.route53 import Route53Handler
+from .helper.ec2 import Ec2Handler
 
 from otto_login import settings
 
@@ -21,6 +22,7 @@ def run():
     parser.add_argument('-v', dest='vpn', action='store_true', default=False, help='connect to vpn')
     parser.add_argument('-a', dest='aws', action='store_true', default=False, help='open aws sessions')
     parser.add_argument('-r', dest='rotate', action='store_true', default=False, help='rotate access keys')
+    parser.add_argument('-s', dest='security_group', action='store_true', default=False, help='add own ip to alb-internal-sg')
     parser.add_argument('-o', dest='record_file', default=None, help='get ARecords from file')
     parser.add_argument('-f', dest='firewall', action='store_true', default=False, help='firewall login')
     parser.add_argument('-c', dest='checkout', action='store_true', default=False, help='checkout all git repos')
@@ -41,12 +43,17 @@ def run():
             print(f'Create AWS-Session for {env}')
             assume_credentials = sts.assume_role(aws_root_session, account)['Credentials']
             run_session = sts.get_credentials_session(assume_credentials)
+            ec2 = Ec2Handler(run_session, env)
 
             sessions_to_save[env] = run_session.get_credentials()
 
             if options.routes:
                 print(f'Get A-Records from {env}')
                 routes.set_routes(Route53Handler(run_session).arecords(env))
+
+            if options.security_group:
+                print(f'Add own ip to {ec2.security_group_name()}')
+                ec2.update_security_group()
 
         sts.save_sessions(sessions_to_save)
 
