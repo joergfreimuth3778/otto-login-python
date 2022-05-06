@@ -51,7 +51,7 @@ class StsHandler:
                                      stderr=subprocess.DEVNULL)
             return process.stdout
         except:
-            raise
+            pass
 
     @staticmethod
     def check_session_token():

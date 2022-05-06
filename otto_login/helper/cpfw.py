@@ -20,7 +20,7 @@ def run_cmd(cmd):
         process = subprocess.run(cmd.split(), check=True, stdout=subprocess.PIPE, universal_newlines=True)
         return process.stdout
     except:
-        raise
+        pass
 
 # import datetime
 # import requests
