@@ -29,7 +29,7 @@ github_repo_prefix = 'tr_'
 firewall_domain = 'fwauth.ov.otto.de'
 firewall_url = f'https://{firewall_domain}'
 
-local_repo_path = '/Users/jfreimut/Otto/workspace/tracking'
+local_repo_path = f'{os.environ["HOME"]}/Otto/workspace/tracking'
 archived_repo_path = f'{local_repo_path}/archived'
 files_to_link = [
     f"{local_repo_path}/tools/javaagent",
