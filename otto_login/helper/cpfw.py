@@ -1,18 +1,20 @@
 import subprocess
+import json
 
 from otto_login import settings
 
 
-def login():
+def login(one_password_session):
     run_cmd(f'cpfw-login '
             f'--url {settings.firewall_url} '
             f'--user {settings.ocn_user} '
-            f'--password {ocn_password()} '
+            f'--password {ocn_password(one_password_session)} '
             f'--insecure')
 
 
-def ocn_password():
-    return run_cmd(settings.ocn_pass)
+def ocn_password(one_password_session):
+    one_password_result = json.loads(run_cmd(f"{settings.ocn_pass} {one_password_session}"))
+    return one_password_result['value']
 
 
 def run_cmd(cmd):
