@@ -1,7 +1,5 @@
 import os
 
-otto_net = '10.0.0.0/8'
-
 ec_account = '027617375449'
 accounts = {
     'live': 726963838652,
@@ -18,7 +16,7 @@ role = 'admin'
 
 firewall_login_tool = 'cpfw-login'
 
-required_tools = ('route', 'aws', 'git', 'security', firewall_login_tool, 'op')
+required_tools = ('aws', 'git', firewall_login_tool, 'op')
 
 github_org = 'otto-ec'
 github_team_id = 2770943
@@ -28,6 +26,7 @@ github_repo_prefix = 'tr_'
 
 firewall_domain = 'fwauth.ov.otto.de'
 firewall_url = f'https://{firewall_domain}'
+nameserver = '10.79.255.100'
 
 local_repo_path = f'{os.environ["HOME"]}/Otto/workspace/tracking'
 archived_repo_path = f'{local_repo_path}/archived'
@@ -36,10 +35,7 @@ files_to_link = [
     f"{local_repo_path}/editor-config/.editorconfig",
 ]
 
-ocn_pass = 'security find-generic-password -j ocn-pwd -w'
-github_token = os.environ["GITHUB_TOKEN"]
 op_signin = 'op signin --raw'
-op_aws_token = 'op item get AWS-Otto --field type=otp --format json --session '
-vpn_check_result = 'CONNECTED'
-vpn_config_name = 'ottogroup'
-aws_internal_security_group = 'alb-ENV-https-internal'
+ocn_pass = 'op item get OCN --fields password --format json --session'
+aws_otp_token = 'op item get AWS-Otto --field type=otp --format json --session'
+github_token = os.environ["GITHUB_TOKEN"]

@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$(dirname "$0")"
 
-pushd ${SCRIPT_DIR}/../ > /dev/null
+pushd "${SCRIPT_DIR}/../" > /dev/null || exit 1
 
 if [[ $# == 0 ]]; then
     python3 -m otto_login -h
@@ -10,4 +10,4 @@ else
     python3 -m otto_login $@
 fi
 
-popd > /dev/null
+popd > /dev/null || exit 1
