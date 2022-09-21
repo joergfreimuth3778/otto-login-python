@@ -7,12 +7,11 @@ from otto_login import settings
 
 
 def start():
-    if not check():
-        run_osa()
+    run_osa()
 
     while not check():
         print("Waiting for connection")
-        time.sleep(2)
+        time.sleep(3)
 
 
 def check():

@@ -83,7 +83,7 @@ def handle_threads(threads):
             thread.wait(5)
         except subprocess.TimeoutExpired:
             thread.kill()
-        except:
+        except Exception:
             raise
 
     return []
@@ -139,23 +139,10 @@ def get_repos(page):
         f'repos?'
         f'per_page={page_size}&'
         f'page={page}',
-        headers={'Authorization': f'token {token()}'}
+        headers={'Authorization': f'token {settings.github_token}'}
     )
     if result.status_code == 200:
         return result.json()
     else:
         print(f'ERROR fetching git repos ({result.status_code})')
         exit(1)
-
-
-def token():
-    try:
-        process = subprocess.run(settings.github_token.split(),
-                                 check=True,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.DEVNULL,
-                                 universal_newlines=True)
-
-        return process.stdout.strip()
-    except:
-        return settings.github_token

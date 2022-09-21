@@ -1,17 +1,15 @@
-import os
-import re
-
-import boto3
-
 from otto_login import settings
+from otto_login import helper_functions as helper
+
+from otto_login.helper.sts import StsHandler
 
 
 class IamHandler:
-    def __init__(self, session: boto3.client):
-        self.iam = session.client('iam')
+    def __init__(self, sts: StsHandler):
+        self.iam = sts.get_profile_session(settings.user_session_profile).client('iam')
 
     def rotate_access_keys(self):
-        local_access_key = self.__get_local_access_key()
+        local_access_key = self.__get_local_access_key().strip()
         if local_access_key in self.__get_user_access_keys():
             self.__delete_user_access_key(local_access_key)
 
@@ -19,8 +17,7 @@ class IamHandler:
 
             self.__save_access_key(new_access_key_data)
         else:
-            print(f"Can't find local access_key ({local_access_key}) in your AWS-Account")
-            exit(1)
+            raise Exception(f"Can't find local access_key ({local_access_key}) in your AWS-Account")
 
     def __get_user_access_keys(self):
         keys = self.iam.list_access_keys()
@@ -38,22 +35,14 @@ class IamHandler:
             AccessKeyId=key
         )
 
-    def __save_access_key(self, access_key_data):
-        self.run_cmd(f"aws configure "
-                     f"set aws_access_key_id {access_key_data['AccessKey']['AccessKeyId']} --profile default")
+    @staticmethod
+    def __save_access_key(access_key_data):
+        helper.run_cmd(f"aws configure "
+                       f"set aws_access_key_id {access_key_data['AccessKey']['AccessKeyId']} --profile default")
 
-        self.run_cmd(f"aws configure "
-                     f"set aws_secret_access_key {access_key_data['AccessKey']['SecretAccessKey']} --profile default")
+        helper.run_cmd(f"aws configure "
+                       f"set aws_secret_access_key {access_key_data['AccessKey']['SecretAccessKey']} --profile default")
 
     @staticmethod
     def __get_local_access_key():
-        with open(settings.credentials_file, 'r') as file:
-            data = file.read()
-            return re.search("\[default\]\naws_access_key_id .*= (.+)\n", data).group(1)
-
-    @staticmethod
-    def run_cmd(cmd):
-        try:
-            os.system(cmd)
-        except:
-            raise
+        return helper.run_cmd("aws configure get aws_access_key_id --profile default")
