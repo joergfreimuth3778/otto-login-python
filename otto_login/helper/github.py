@@ -8,7 +8,7 @@ import requests
 from otto_login import settings
 
 
-def clone_github_repos():
+def clone_repos():
     threads = []
     all_threads = []
 
