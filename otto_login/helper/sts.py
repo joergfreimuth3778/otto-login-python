@@ -1,5 +1,4 @@
 import boto3
-import json
 
 from otto_login import settings
 from otto_login import helper_functions as helper
@@ -9,9 +8,7 @@ class StsHandler:
     def __init__(self):
         self.sts = boto3.client('sts')
 
-    def save_session(self, op_session):
-        op_result = helper.run_cmd(f"{settings.aws_otp_token} {op_session}").strip()
-        token = json.loads(op_result)['totp']
+    def save_session(self, token):
         self.save_user_session(self.get_user_session_token(token)['Credentials'])
 
     @staticmethod
@@ -24,6 +21,12 @@ class StsHandler:
             return True
         except Exception:
             return False
+
+    @staticmethod
+    def get_profile_session(profile_name: str):
+        return boto3.Session(
+            profile_name=profile_name
+        )
 
     def get_user_session_token(self, mfa_token: str):
         return self.sts.get_session_token(

@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 
 from otto_login import settings
@@ -22,13 +23,12 @@ def run():
     parser.add_argument('-v', dest='vpn', action='store_true', default=False, help='connect to vpn')
 
     options = parser.parse_args()
-    one_password_session = None
+
     sts = StsHandler()
 
     if (options.aws or options.rotate) and not sts.check_user_session_token():
         print(f'AWS-Login')
-        one_password_session = helper.run_cmd(settings.op_signin)
-        sts.save_session(one_password_session)
+        sts.save_session(get_secrets(settings.aws_otp_token, 'totp'))
 
     if options.rotate:
         print(f'Rotate AccessKeys')
@@ -40,15 +40,22 @@ def run():
 
     if options.firewall:
         print('Firewall-Login')
-        if not one_password_session:
-            one_password_session = helper.run_cmd(settings.op_signin)
-
-        check_tools({settings.firewall_login_tool})
-        cpfw.login(one_password_session)
+        cpfw.login(get_secrets(settings.ocn_pass, 'value'))
 
     if options.vpn and not vpn.check():
         print("Start VPN")
         vpn.start()
+
+
+def get_secrets(cmd, data):
+    one_password_session = None
+
+    if not one_password_session:
+        one_password_session = helper.run_cmd(settings.op_signin)
+
+    op_result = helper.run_cmd(f"{cmd} {one_password_session}")
+
+    return json.loads(op_result)[data].strip()
 
 
 def check_tools(tools=settings.required_tools):
