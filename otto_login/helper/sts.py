@@ -25,12 +25,6 @@ class StsHandler:
         except Exception:
             return False
 
-    @staticmethod
-    def get_profile_session(profile_name: str):
-        return boto3.Session(
-            profile_name=profile_name
-        )
-
     def get_user_session_token(self, mfa_token: str):
         return self.sts.get_session_token(
             SerialNumber=settings.mfa_device,
