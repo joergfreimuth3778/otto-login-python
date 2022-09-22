@@ -7,6 +7,7 @@ from otto_login.helper import vpn
 from otto_login.helper.iam import IamHandler
 from otto_login.helper.sts import StsHandler
 from otto_login import helper_functions as helper
+from otto_login.helper_functions import SecretsHelper
 
 
 def run():
@@ -23,10 +24,14 @@ def run():
     options = parser.parse_args()
 
     sts = StsHandler()
+    secrets = SecretsHelper()
+
+    if options.aws or options.rotate or options.firewall:
+        secrets.op_login()
 
     if (options.aws or options.rotate) and not sts.check_user_session_token():
         print(f'AWS Login')
-        sts.save_session(helper.get_secrets(settings.aws_otp_token, 'totp'))
+        sts.save_session(secrets.get_secrets(settings.aws_otp_token, 'totp'))
 
     if options.rotate:
         print(f'Rotate AccessKeys')
@@ -36,13 +41,13 @@ def run():
         print('Pull or clone repos')
         github.clone_repos()
 
-    if options.firewall:
-        print('Firewall Login')
-        cpfw.login(helper.get_secrets(settings.ocn_pass, 'value'))
-
     if options.vpn and not vpn.check():
         print("Start VPN")
         vpn.start()
+
+    if options.firewall:
+        print('Firewall Login')
+        cpfw.login(secrets.get_secrets(settings.ocn_pass, 'value'))
 
 
 if __name__ == '__main__':

@@ -5,27 +5,28 @@ import subprocess
 from otto_login import settings
 
 
+class SecretsHelper:
+    def __init__(self, ):
+        self.one_password_session = None
+
+    def op_login(self):
+        if not self.one_password_session:
+            self.one_password_session = run_cmd(settings.op_signin)
+
+    def get_secrets(self, cmd, data):
+        op_result = run_cmd(f"{cmd} {self.one_password_session}")
+
+        return json.loads(op_result)[data].strip()
+
+
 def run_cmd(cmd):
-    try:
-        process = subprocess.run(cmd.split(),
-                                 check=True,
-                                 stdout=subprocess.PIPE,
-                                 universal_newlines=True,
-                                 stderr=subprocess.DEVNULL)
-        return process.stdout
-    except Exception as e:
-        raise Exception(f"ERROR running {cmd}")
+    proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+    stdout, _ = proc.communicate()
 
+    if proc.returncode != 0:
+        raise Exception(f"ERROR: cmd {cmd.split()[0]} failed")
 
-def get_secrets(cmd, data):
-    one_password_session = None
-
-    if not one_password_session:
-        one_password_session = run_cmd(settings.op_signin)
-
-    op_result = run_cmd(f"{cmd} {one_password_session}")
-
-    return json.loads(op_result)[data].strip()
+    return stdout.decode().strip()
 
 
 def check_tools(tools=settings.required_tools):

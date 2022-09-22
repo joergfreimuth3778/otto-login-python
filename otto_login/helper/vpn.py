@@ -10,7 +10,6 @@ def start():
     run_osa()
 
     while not check():
-        print("Waiting for connection")
         time.sleep(3)
 
 

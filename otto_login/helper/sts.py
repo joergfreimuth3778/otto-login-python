@@ -36,6 +36,7 @@ class StsHandler:
 
     @staticmethod
     def save_user_session(credentials):
+        print(f"  saving {settings.user_session_profile} profile to aws credentials file")
         aws_cmd = 'aws configure set'
         profile_param = f'--profile {settings.user_session_profile}'
         helper.run_cmd(f"{aws_cmd} aws_access_key_id {credentials['AccessKeyId']} {profile_param}")
