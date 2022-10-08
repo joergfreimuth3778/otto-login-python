@@ -6,6 +6,7 @@ import shutil
 import requests
 
 from otto_login import settings
+from otto_login import helper_functions as helper
 
 
 def clone_repos():
@@ -102,17 +103,12 @@ def cleanup(archived_repos):
 
 
 def pull_repo(local_path):
-    return subprocess.Popen(
-        ['git', '-C', local_path, 'pull', '-q', '-r'],
-        stderr=subprocess.DEVNULL
-    )
+    return helper.run_cmd(f"git -C {local_path} pull -q -r", return_cmd=True, stderr=subprocess.DEVNULL)
 
 
 def clone_repo(local_path, repo):
-    return subprocess.Popen(
-        ['git', 'clone', f'git@{settings.github_base}:{settings.github_org}/{repo}', local_path],
-        stderr=subprocess.DEVNULL
-    )
+    cmd = f"git clone git@{settings.github_base}:{settings.github_org}/{repo} {local_path}"
+    return helper.run_cmd(cmd, return_cmd=True, stderr=subprocess.DEVNULL)
 
 
 def get_all_repos():

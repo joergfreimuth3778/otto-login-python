@@ -19,12 +19,18 @@ class SecretsHelper:
         return json.loads(op_result)[data].strip()
 
 
-def run_cmd(cmd):
-    proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+def run_cmd(cmd, return_cmd=False, stderr=subprocess.STDOUT):
+    proc = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=stderr)
+
+    if return_cmd:
+        return proc
+
     stdout, _ = proc.communicate()
 
     if proc.returncode != 0:
-        raise Exception(f"ERROR: cmd {cmd.split()[0]} failed")
+        print(f"ERROR running cmd {cmd.split()[0]}\n"
+              f"{stdout.decode()}")
+        exit(1)
 
     return stdout.decode().strip()
 

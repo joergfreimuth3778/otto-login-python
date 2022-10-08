@@ -25,7 +25,7 @@ def run_osa():
     code, out, err = osascript.run(''
                                     'tell application "System Events" to tell process "GlobalProtect"\n'
                                         'click menu bar item 1 of menu bar 2\n'
-                                        'click button 2 of window 1\n'
+                                        'click button 2 of window 0\n'
                                     'end tell'
                                    )
     if code == 0:
