@@ -11,6 +11,7 @@ boto3 = "*"
 requests = "*"
 pycryptodomex = "*"
 osascript = "*"
+dnspython = "*"
 
 [requires]
 python_version = "3.9"

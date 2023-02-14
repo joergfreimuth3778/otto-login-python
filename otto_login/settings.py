@@ -24,7 +24,17 @@ files_to_link = [
 firewall_domain = 'fwauth.ov.otto.de'
 firewall_url = f'https://{firewall_domain}'
 nameserver = '10.79.255.100'
+otto_net = '10.0.0.0/8'
 
 op_signin = 'op signin --raw'
 ocn_pass = 'op item get OCN --fields password --format json --session'
+sudo_pass = 'op item get MacLogin --fields password --format json --session'
 aws_otp_token = 'op item get AWS-Otto --field type=otp --format json --session'
+
+vpn_routes = [
+    'alb-infra-internal-962665732.eu-central-1.elb.amazonaws.com',
+    'alb-develop-internal-1166730190.eu-central-1.elb.amazonaws.com',
+    'alb-develop-external-83862302.eu-central-1.elb.amazonaws.com',
+    'alb-live-external-1443269452.eu-central-1.elb.amazonaws.com',
+    'alb-live-internal-1699086996.eu-central-1.elb.amazonaws.com'
+]

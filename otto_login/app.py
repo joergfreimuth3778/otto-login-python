@@ -4,6 +4,7 @@ from otto_login import settings
 from otto_login.helper import cpfw
 from otto_login.helper import github
 from otto_login.helper import vpn
+from otto_login.helper import routes
 from otto_login.helper.iam import IamHandler
 from otto_login.helper.sts import StsHandler
 from otto_login import helper_functions as helper
@@ -20,13 +21,14 @@ def run():
     parser.add_argument('-f', dest='firewall', action='store_true', default=False, help='firewall login')
     parser.add_argument('-r', dest='rotate', action='store_true', default=False, help='rotate access keys')
     parser.add_argument('-v', dest='vpn', action='store_true', default=False, help='connect to vpn')
+    parser.add_argument('-s', dest='set_routes', action='store_true', default=False, help='set vpn routes')
 
     options = parser.parse_args()
 
     sts = StsHandler()
     secrets = SecretsHelper()
 
-    if options.aws or options.rotate or options.firewall:
+    if options.aws or options.rotate or options.firewall or options.set_routes:
         secrets.op_login()
 
     if (options.aws or options.rotate) and not sts.check_user_session_token():
@@ -43,7 +45,12 @@ def run():
 
     if options.vpn and not vpn.check():
         print("Start VPN")
+        default_interface = routes.get_default_interface()
         vpn.start()
+        vpn_interface = routes.get_default_interface()
+
+        if options.set_routes:
+            routes.set_routes([], secrets.get_secrets(settings.sudo_pass, 'value'), vpn_interface, default_interface)
 
     if options.firewall:
         print('Firewall Login')
