@@ -28,7 +28,7 @@ def run():
     sts = StsHandler()
     secrets = SecretsHelper()
 
-    if options.aws or options.rotate or options.firewall or options.set_routes:
+    if options.aws or options.rotate or (options.firewall and options.vpn) or options.set_routes:
         secrets.op_login()
 
     if (options.aws or options.rotate) and not sts.check_user_session_token():
@@ -54,7 +54,10 @@ def run():
 
     if options.firewall:
         print('Firewall Login')
-        cpfw.login(secrets.get_secrets(settings.ocn_pass, 'value'))
+        if options.vpn:
+            cpfw.login(secrets.get_secrets(settings.ocn_pass, 'value'))
+        else:
+            print("  skipped, no VPN connection established")
 
 
 if __name__ == '__main__':

@@ -37,7 +37,7 @@ def clone_repos():
 
     cleanup(archived_repos)
 
-    link_files(to_pull_or_clone)
+    # link_files(to_pull_or_clone)
 
 
 def link_files(all_tr_repos):

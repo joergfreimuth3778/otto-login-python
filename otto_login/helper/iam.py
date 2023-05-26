@@ -30,7 +30,7 @@ class IamHandler:
         )
 
     def __delete_user_access_key(self, key):
-        print(f"  deleting key {key}")
+        print(f"  key {key} deleted")
         self.iam.delete_access_key(
             UserName=settings.ocn_user,
             AccessKeyId=key
@@ -41,7 +41,7 @@ class IamHandler:
         key_id = access_key_data['AccessKey']['AccessKeyId']
         key_secret = access_key_data['AccessKey']['SecretAccessKey']
 
-        print(f"  saving key {key_id}")
+        print(f"  key {key_id} saved")
 
         helper.run_cmd(f"aws configure "
                        f"set aws_access_key_id {key_id} --profile default")
